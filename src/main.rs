@@ -1,22 +1,24 @@
-use std::net::SocketAddr;
-use axum::{routing::get, Router};
+use axum::{
+    routing::get,
+    Router,
+};
+use std::{env, net::SocketAddr};
+use tower_http::services::ServeDir;
 
 #[tokio::main]
 async fn main() {
-    // Railway provides PORT automatically
-    let port: u16 = std::env::var("PORT")
-        .unwrap_or_else(|_| "3000".to_string())
+    // Get port from Railway (or default to 8080 for local)
+    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
+
+    let addr: SocketAddr = format!("0.0.0.0:{}", port)
         .parse()
-        .unwrap();
+        .expect("Invalid address");
 
-    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+    println!("🚀 Server running on http://{}", addr);
 
-    println!("Server running on http://{}", addr);
-
+    // Serve static files from "static" folder
     let app = Router::new()
-        .route("/", get(|| async { 
-            "Astraeus Next Gen is live 🚀" 
-        }));
+        .nest_service("/", ServeDir::new("static"));
 
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
