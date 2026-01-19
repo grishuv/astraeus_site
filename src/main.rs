@@ -1,31 +1,25 @@
-use axum::{
-    routing::get,
-    Router,
-    response::Html,
-};
-use tower_http::services::ServeDir;
 use std::net::SocketAddr;
-
-async fn index() -> Html<&'static str> {
-    Html(include_str!("../index.html"))
-}
+use axum::{routing::get, Router};
 
 #[tokio::main]
 async fn main() {
-    // Serve static files (css + images)
-    let static_files = ServeDir::new("static");
+    // Railway provides PORT automatically
+    let port: u16 = std::env::var("PORT")
+        .unwrap_or_else(|_| "3000".to_string())
+        .parse()
+        .unwrap();
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
+
+    println!("Server running on http://{}", addr);
 
     let app = Router::new()
-        .route("/", get(index))
-        .nest_service("/static", static_files);
+        .route("/", get(|| async { 
+            "Astraeus Next Gen is live 🚀" 
+        }));
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
-    println!("Server running at http://{}", addr);
-
-    axum::serve(
-        tokio::net::TcpListener::bind(addr).await.unwrap(),
-        app,
-    )
-    .await
-    .unwrap();
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
