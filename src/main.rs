@@ -1,23 +1,51 @@
-use axum::Router;
-use std::{env, net::SocketAddr};
-use tokio::net::TcpListener;
-use tower_http::services::ServeDir;
+use axum::{
+    routing::get,
+    Router,
+    response::Html,
+};
+use std::{net::SocketAddr, env};
 
 #[tokio::main]
 async fn main() {
-    // Railway provides PORT automatically
-    let port = env::var("PORT").unwrap_or_else(|_| "8080".to_string());
-    let addr: SocketAddr = format!("0.0.0.0:{}", port)
-        .parse()
-        .expect("Invalid address");
+    // Railway gives port in env
+    let port = env::var("PORT")
+        .unwrap_or("8080".to_string())
+        .parse::<u16>()
+        .unwrap();
+
+    let app = Router::new()
+        .route("/", get(home));
+
+    let addr = SocketAddr::from(([0, 0, 0, 0], port));
 
     println!("🚀 Server running on http://{}", addr);
 
-    // Serve static website from /static folder
-    let app = Router::new()
-        .nest_service("/", ServeDir::new("static"));
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
+}
 
-    // Correct way for Axum 0.7
-    let listener = TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app).await.unwrap();
+async fn home() -> Html<&'static str> {
+    Html(r#"
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Astraeus Next Gen</title>
+    <style>
+        body {
+            background:#0f172a;
+            color:white;
+            font-family:Arial;
+            text-align:center;
+            padding-top:100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Astraeus Next Gen</h1>
+    <p>Rust website successfully deployed on Railway!</p>
+</body>
+</html>
+"#)
 }
