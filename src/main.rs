@@ -3,11 +3,11 @@ use axum::{
     Router,
     response::Html,
 };
-use std::{net::SocketAddr, env};
+use std::{env, net::SocketAddr};
 
 #[tokio::main]
 async fn main() {
-    // Railway gives port in env
+    // Railway provides PORT
     let port = env::var("PORT")
         .unwrap_or("8080".to_string())
         .parse::<u16>()
@@ -17,13 +17,15 @@ async fn main() {
         .route("/", get(home));
 
     let addr = SocketAddr::from(([0, 0, 0, 0], port));
-
     println!("🚀 Server running on http://{}", addr);
 
-    axum::Server::bind(&addr)
-        .serve(app.into_make_service())
-        .await
-        .unwrap();
+    // NEW AXUM 0.7 STYLE
+    axum::serve(
+        tokio::net::TcpListener::bind(addr).await.unwrap(),
+        app,
+    )
+    .await
+    .unwrap();
 }
 
 async fn home() -> Html<&'static str> {
