@@ -573,24 +573,64 @@ body {
 
 }
 
-.policy-page {
+/* Dark Privacy Page */
+.dark-page {
+  background: #000;
+  color: #e5e7eb;
+  font-family: "Inter", system-ui, sans-serif;
+}
+
+.policy-container {
   max-width: 900px;
-  margin: 80px auto;
-  padding: 20px;
-  line-height: 1.7;
+  margin: 100px auto;
+  padding: 0 20px;
 }
 
-.policy-page h1 {
-  font-size: 2.2rem;
+.policy-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color: #ffffff;
+}
+
+.policy-date {
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 30px;
+}
+
+.policy-container section {
+  margin-bottom: 28px;
+}
+
+.policy-container h3 {
+  font-size: 1.2rem;
   margin-bottom: 10px;
+  color: #ffffff;
 }
 
-.policy-page h3 {
-  margin-top: 25px;
-  color: #1f2933;
+.policy-container p,
+.policy-container li {
+  font-size: 0.95rem;
+  line-height: 1.7;
+  color: #d1d5db;
 }
 
-.policy-page a {
-  color: #2563eb;
+.policy-container ul {
+  padding-left: 20px;
+  margin-top: 8px;
+}
+
+.policy-container li {
+  margin-bottom: 6px;
+}
+
+.policy-email a {
+  color: #f97316;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.policy-email a:hover {
   text-decoration: underline;
 }
